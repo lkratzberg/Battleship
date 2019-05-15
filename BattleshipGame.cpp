@@ -11,46 +11,76 @@ const int BOARD_SIZE = 10;
 
 void fillBoard(char board[][BOARD_SIZE]);
 void placeShips(char board[][BOARD_SIZE], Battleship& ship);
-char guess(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE]);
-void AIguess(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE], 
+char guess(char board[][BOARD_SIZE], char solution1Board[][BOARD_SIZE]);
+void AIguess(char board[][BOARD_SIZE], char solution1Board[][BOARD_SIZE], 
 	int& direction1, int& direction2, bool& isHit);
-void keepGuessing(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE], 
+void keepGuessing(char board[][BOARD_SIZE], char solution1Board[][BOARD_SIZE], 
 	int guessRow, int guessCol, bool& isHit, int& direction2);
 void setDirections(int& direction1, int& direction2);
-void keepScore(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE],
+void keepScore(char board[][BOARD_SIZE], char solution1Board[][BOARD_SIZE],
 	Battleship& ship, int& noShips);
-void printBoard(char board[][BOARD_SIZE]);
+void printBoard(char player1Board[][BOARD_SIZE], char player2Board[][BOARD_SIZE]);
 
 int main()
 {
 	srand(time(0)); 
-	char board[BOARD_SIZE][BOARD_SIZE];
-	char playerBoard[BOARD_SIZE][BOARD_SIZE];
+	
+	char player1Board[BOARD_SIZE][BOARD_SIZE]; //actual person player's board
+	char player2Board[BOARD_SIZE][BOARD_SIZE]; //computer player's board
+	char solution1Board[BOARD_SIZE][BOARD_SIZE]; //person's solution board
+	char solution2Board[BOARD_SIZE][BOARD_SIZE]; //computer player's solution board
+	
 	int noShips = 5;
 	int direction1;
 	int direction2;
 	bool isHit = false;
+	string playerName;
 	
-	Battleship carrier(5, "Aircraft Carrier", 'A');
-	Battleship cruiser(4, "Cruiser", 'C');
-	Battleship destroyer(3, "Destroyer", 'D');
-	Battleship submarine(3, "Submarine", 'S');
-	Battleship boat(2, "Boat", 'B');
+	Battleship carrier1(5, "Aircraft Carrier", 'A');
+	Battleship cruiser1(4, "Cruiser", 'C');
+	Battleship destroyer1(3, "Destroyer", 'D');
+	Battleship submarine1(3, "Submarine", 'S');
+	Battleship boat1(2, "Boat", 'B');
 
-	fillBoard(board);
-	fillBoard(playerBoard);
-	placeShips(playerBoard, carrier);
-	placeShips(playerBoard, cruiser);
-	placeShips(playerBoard, destroyer);
-	placeShips(playerBoard, submarine);
-	placeShips(playerBoard, boat);
+	Battleship carrier2(5, "Aircraft Carrier", 'A');
+	Battleship cruiser2(4, "Cruiser", 'C');
+	Battleship destroyer2(3, "Destroyer", 'D');
+	Battleship submarine2(3, "Submarine", 'S');
+	Battleship boat2(2, "Boat", 'B');
 
-	cout << "Board for viewing: " << endl;
-	printBoard(board);
-	cout << endl << endl << "Board with ships: " << endl;
-	printBoard(playerBoard);
-	cout << endl << endl << "Let's Play!" << endl;
+	fillBoard(player1Board);
+	fillBoard(player2Board);
+	fillBoard(solution1Board);
+	fillBoard(solution2Board);
 	
+	placeShips(solution1Board, carrier1);
+	placeShips(solution1Board, cruiser1);
+	placeShips(solution1Board, destroyer1);
+	placeShips(solution1Board, submarine1);
+	placeShips(solution1Board, boat1);
+	placeShips(solution2Board, carrier2);
+	placeShips(solution2Board, cruiser2);
+	placeShips(solution2Board, destroyer2);
+	placeShips(solution2Board, submarine2);
+	placeShips(solution2Board, boat2);
+
+	cout << "************************** Battleship **************************" << endl;
+	cout << "Enter player's name: " << endl;
+	cin >> playerName;
+
+	cout << "Player will enter a coordinate to try to \"hit\" the ship." << endl
+		<< "The computer play will occur right after automatically." << endl
+		<< "The first player to sink all 5 ships wins." << endl << endl;
+	cout << endl << endl << "Let's Play!" << endl << endl;
+
+	cout << endl << "****** " << playerName << "'s Board ******" 
+		<< "          "
+		<< "****** Computer's Board ******" << endl;
+	
+	printBoard(player1Board, player1Board);
+	
+	//ask user to input their play
+	//computer plays immediately after - only 1 play, how will this happen?
 	
 
 	return 0;
@@ -149,7 +179,7 @@ void placeShips(char board[][BOARD_SIZE], Battleship& ship)
 	}
 }
 
-char guess(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE])
+char guess(char board[][BOARD_SIZE], char solution1Board[][BOARD_SIZE])
 {
 	char guess;
 	int guess2;
@@ -157,10 +187,10 @@ char guess(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE])
 	cin >> guess >> guess2;
 
 	//need rule for if they guess something off the board
-	if (playerBoard[guess2 - 1][guess - 65] != '*')
+	if (solution1Board[guess2 - 1][guess - 65] != '*')
 	{
 		board[guess2 - 1][guess - 65] = 'H';
-		return playerBoard[guess2 - 1][guess - 65];
+		return solution1Board[guess2 - 1][guess - 65];
 	}	
 	else
 	{
@@ -170,7 +200,7 @@ char guess(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE])
 }
 
 //computer generated guesses 
-void AIguess(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE], int& direction1, int& direction2, bool& isHit)
+void AIguess(char board[][BOARD_SIZE], char solution1Board[][BOARD_SIZE], int& direction1, int& direction2, bool& isHit)
 {
 	int guessRow = rand() % 10;
 	int guessCol = rand() % 10;
@@ -178,7 +208,7 @@ void AIguess(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE], int& dire
 	int originCol = guessCol;
 	
 	//if hit
-	if (playerBoard[guessRow][guessCol] != '*')
+	if (solution1Board[guessRow][guessCol] != '*')
 	{
 		board[guessRow][guessCol] = 'H';
 		isHit = true;
@@ -191,20 +221,20 @@ void AIguess(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE], int& dire
 			if (direction2 == -1) //direction is up
 			{
 				guessCol = originCol + direction2;
-				keepGuessing(board, playerBoard, guessRow, guessCol, isHit, direction2);
+				keepGuessing(board, solution1Board, guessRow, guessCol, isHit, direction2);
 					
 				direction2 = 1; //change direction to go down
 				guessCol = originCol + direction2;
-				keepGuessing(board, playerBoard, guessRow, guessCol, isHit, direction2);
+				keepGuessing(board, solution1Board, guessRow, guessCol, isHit, direction2);
 			}
 			if (direction2 == 1) //direction is down
 			{
 				guessCol = originCol + direction2;
-				keepGuessing(board, playerBoard, guessRow, guessCol, isHit, direction2);
+				keepGuessing(board, solution1Board, guessRow, guessCol, isHit, direction2);
 						
 				direction2 = -1; //change direction to go up
 				guessCol = originCol + direction2;
-				keepGuessing(board, playerBoard, guessRow, guessCol, isHit, direction2);
+				keepGuessing(board, solution1Board, guessRow, guessCol, isHit, direction2);
 			}
 		}
 		
@@ -213,20 +243,20 @@ void AIguess(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE], int& dire
 			if (direction2 == -1) //direction is left
 			{
 				guessRow = originRow + direction2;
-				keepGuessing(board, playerBoard, guessRow, guessCol, isHit, direction2);
+				keepGuessing(board, solution1Board, guessRow, guessCol, isHit, direction2);
 				
 				direction2 = 1;  //change direction to right
 				guessRow = originRow + direction2;
-				keepGuessing(board, playerBoard, guessRow, guessCol, isHit, direction2);
+				keepGuessing(board, solution1Board, guessRow, guessCol, isHit, direction2);
 			}
 			if (direction2 == 1) //direction is right
 			{
 				guessRow = originRow + direction2;
-				keepGuessing(board, playerBoard, guessRow, guessCol, isHit, direction2);
+				keepGuessing(board, solution1Board, guessRow, guessCol, isHit, direction2);
 				
 				direction2 = -1; //change direction to left
 				guessRow = originRow + direction2;
-				keepGuessing(board, playerBoard, guessRow, guessCol, isHit, direction2);
+				keepGuessing(board, solution1Board, guessRow, guessCol, isHit, direction2);
 			}
 			
 		}
@@ -237,24 +267,24 @@ void AIguess(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE], int& dire
 	}
 }
 
-void keepGuessing(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE], int guessRow, int guessCol, bool& isHit, int& direction2)
+void keepGuessing(char board[][BOARD_SIZE], char solution1Board[][BOARD_SIZE], int guessRow, int guessCol, bool& isHit, int& direction2)
 {
-	if (playerBoard[guessRow][guessCol] != '*')
+	if (solution1Board[guessRow][guessCol] != '*')
 	{
 		isHit = true;
 		while (isHit) //if hit, keep going in same direction
 		{
-			if (playerBoard[guessRow][guessCol] != '*')
+			if (solution1Board[guessRow][guessCol] != '*')
 			{
 				board[guessRow][guessCol] = 'H';
 				isHit = true;
 				guessCol += direction2;
-				printBoard(board);
+				
 			}
 			else
 			{
 				isHit = false;
-				printBoard(board);
+				
 			}
 				
 		}
@@ -270,23 +300,30 @@ void setDirections(int& direction1, int& direction2)
 		direction2 = -1;
 }
 
-void keepScore(char board[][BOARD_SIZE], char playerBoard[][BOARD_SIZE], 
+void keepScore(char board[][BOARD_SIZE], char solution1Board[][BOARD_SIZE], 
 	Battleship& ship, int& noShips)
 {
 	
 
 }
 
-void printBoard(char board[][BOARD_SIZE])
+void printBoard(char player1Board[][BOARD_SIZE], char player2Board[][BOARD_SIZE])
 {
-	cout << "    A B C D E F G H I J" << endl;
+	cout << "    A B C D E F G H I J" << "               " << "    A B C D E F G H I J" << endl;
 	for (int i = 0; i < BOARD_SIZE; i++)
 	{
-		cout << left << setw(3) << i+1;
+		cout << left << setw(3) << i+1; //print player's board
 		for (int j = 0; j < BOARD_SIZE; j++)
 		{
-			cout << right << setw(2) << board[i][j];
+			cout << right << setw(2) << player1Board[i][j];
 		}
+		cout << "               ";
+		cout << left << setw(3) << i + 1; //print computer's board
+		for (int j = 0; j < BOARD_SIZE; j++)
+		{
+			cout << right << setw(2) << player2Board[i][j];
+		}
+
 		cout << endl;
 	}
 }
